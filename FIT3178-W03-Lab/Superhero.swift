@@ -15,14 +15,14 @@ case dc = 1
 
 class Superhero: NSObject {
     // Why optional, research on persistent data
-    var name: String?;
-    var abilities: String?;
-    var universe: Universe?;
+    var name: String?
+    var abilities: String?
+    var universe: Universe?
     
     init(name: String, abilities: String, universe: Universe){
         self.name = name;
-        self.abilities = abilities;
-        self.universe = universe;
+        self.abilities = abilities
+        self.universe = universe
     }
     
 }
