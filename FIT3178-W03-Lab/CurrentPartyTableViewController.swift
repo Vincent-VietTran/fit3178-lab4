@@ -7,7 +7,21 @@
 
 import UIKit
 
-class CurrentPartyTableViewController: UITableViewController {
+class CurrentPartyTableViewController: UITableViewController, AddSuperheroDelegate {
+    func addSuperhero(_ newHero: Superhero) -> Bool {
+        if currentParty.count >= 6 {
+        return false
+        }
+        tableView.performBatchUpdates({
+        currentParty.append(newHero)
+        tableView.insertRows(at: [IndexPath(row: currentParty.count - 1, section:
+        SECTION_HERO)],
+        with: .automatic)
+        tableView.reloadSections([SECTION_INFO], with: .automatic)
+        }, completion: nil)
+        return true
+    }
+    
 //    Table View Controllers have the concept of sections. Each section can
 //    have its own type of cell and number of cells. For this app, we have two sections: one
 //    for heroes in our party and one for displaying the current number of heroes in our party
@@ -25,6 +39,7 @@ class CurrentPartyTableViewController: UITableViewController {
     var currentParty: [Superhero] = []
     
     
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -35,7 +50,7 @@ class CurrentPartyTableViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
         
         // Remove when finalised
-        testHeroes()
+//        testHeroes()
     }
 
     // MARK: - Table view data source
@@ -156,14 +171,18 @@ class CurrentPartyTableViewController: UITableViewController {
     }
     */
 
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
+        if segue.identifier == "allHeroesSegue" {
+            let destination = segue.destination as! AllHeroesTableViewController
+            destination.superHeroDelegate = self
+        }
     }
-    */
+    
 
 }
