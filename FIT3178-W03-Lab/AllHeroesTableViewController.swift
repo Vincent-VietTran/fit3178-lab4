@@ -7,7 +7,10 @@
 
 import UIKit
 
-class AllHeroesTableViewController: UITableViewController {
+class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdating {
+    
+    
+    
     let SECTION_HERO = 0
     let SECTION_INFO = 1
     let NUM_SECTIONS = 2
@@ -16,8 +19,28 @@ class AllHeroesTableViewController: UITableViewController {
     let CELL_INFO = "totalCell"
     
     var allHeroes: [Superhero] = []
-    
+    var filteredHeroes: [Superhero] = []
     weak var superHeroDelegate: AddSuperheroDelegate?
+    
+//    We can define our own search functionality via the UISearchResultsUpdating protocol provided by UIKit.
+    // Will be called every time a change is detected in the search bar.
+    func updateSearchResults(for searchController: UISearchController) {
+        // Make sure search text is not emty before proceed with filtering
+        guard let searchText = searchController.searchBar.text?.lowercased() else {
+            return
+        }
+        
+//        Apply a filter if there is value in search text, otherwise we will set the filteredHeroes to allHeroes.
+        if searchText.count > 0{
+//            The filter method of the array class allows us to set custom filtering using a closure
+            filteredHeroes = allHeroes.filter({(hero: Superhero) -> Bool in
+                return (hero.name?.lowercased().contains(searchText) ?? false)
+            })
+        } else{
+            filteredHeroes = allHeroes
+        }
+        tableView.reloadData()
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,6 +51,22 @@ class AllHeroesTableViewController: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
         createDefaultHeroes()
+        filteredHeroes = allHeroes
+        
+//        create the UISeachController and assign it to the View Controller
+//        initializing a UISearchController. At this stage we do not give a
+//       specialised view controller for displaying search results (will do in future week)
+        let searchController = UISearchController(searchResultsController: nil)
+//        setting the searchResultsUpdater (delegate), which will update based
+//       on the search to current view (also why this view has to conform UISearchResultsUpdating protocol)
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Search All Heroes"
+        
+//      Also tell our navigationItem that its search controller is the one we just created.
+        navigationItem.searchController = searchController
+        // This view controller decides how the search controller is presented
+        definesPresentationContext = true
     }
 
     // MARK: - Table view data source
@@ -40,7 +79,7 @@ class AllHeroesTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         switch(section){
             case SECTION_HERO:
-                return allHeroes.count
+                return filteredHeroes.count
             case SECTION_INFO:
                 return 1
             default:
@@ -56,7 +95,7 @@ class AllHeroesTableViewController: UITableViewController {
 //            you know with 100% certainty that the cell (or other type) you are casting is a particular type.
             let heroCell = tableView.dequeueReusableCell(withIdentifier: CELL_HERO, for: indexPath)
             var content = heroCell.defaultContentConfiguration()
-            let hero = allHeroes[indexPath.row]
+            let hero = filteredHeroes[indexPath.row]
             content.text = hero.name
             content.secondaryText = hero.abilities
             heroCell.contentConfiguration = content
@@ -65,7 +104,7 @@ class AllHeroesTableViewController: UITableViewController {
             // Configure and return an info cell instead
             let infoCell = tableView.dequeueReusableCell(withIdentifier: CELL_INFO, for: indexPath) as! HeroCountTableViewCell
             
-            infoCell.totalLabel?.text = "\(allHeroes.count) heroes in the database"
+            infoCell.totalLabel?.text = "\(filteredHeroes.count) heroes in the database"
             return infoCell
         }
     }
@@ -88,8 +127,12 @@ class AllHeroesTableViewController: UITableViewController {
         if editingStyle == .delete && indexPath.section == SECTION_HERO {
             // Delete the row from the data source if it belongs to hero section
             tableView.performBatchUpdates({
-                // Remove Hero from the list of heroes
-                allHeroes.remove(at: indexPath.row)
+                // Make sure when a hero delelted,it is removed in both filtered and all heroes list
+                if let index = self.allHeroes.firstIndex(of: filteredHeroes[indexPath.row]) {
+                self.allHeroes.remove(at: index)
+                }
+                // Remove Hero from the list of filtered heroes
+                filteredHeroes.remove(at: indexPath.row)
                 // Delete row from table view
                 tableView.deleteRows(at: [indexPath], with: .fade)
                 // Update the info section (decrement hero count)
@@ -102,7 +145,7 @@ class AllHeroesTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath:
     IndexPath) {
         if let superHeroDelegate = superHeroDelegate {
-            if superHeroDelegate.addSuperhero(allHeroes[indexPath.row]){
+            if superHeroDelegate.addSuperhero(filteredHeroes[indexPath.row]){
                 navigationController?.popViewController(animated: false)
                 return
             } else{
