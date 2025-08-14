@@ -7,10 +7,7 @@
 
 import UIKit
 
-class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdating {
-    
-    
-    
+class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdating, AddSuperheroDelegate {
     let SECTION_HERO = 0
     let SECTION_INFO = 1
     let NUM_SECTIONS = 2
@@ -21,6 +18,26 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
     var allHeroes: [Superhero] = []
     var filteredHeroes: [Superhero] = []
     weak var superHeroDelegate: AddSuperheroDelegate?
+    
+    //  made are conforming to the AddSuperheroDelegate
+    func addSuperhero(_ newHero: Superhero) -> Bool {
+        tableView.performBatchUpdates({
+        // TODO: Adding validation for extension task
+            
+        // Safe because search can't be active when Add button is tapped.
+        // Add newly added hero to both all heroes and filtered heroes array
+        allHeroes.append(newHero)
+        filteredHeroes.append(newHero)
+        // Insert the new record into the table view in hero section
+        tableView.insertRows(at: [IndexPath(row: filteredHeroes.count - 1, section:
+        SECTION_HERO)],
+        with: .automatic)
+        // Reload section info to reflect the change
+        tableView.reloadSections([SECTION_INFO], with: .automatic)
+        }, completion: nil)
+        // Notify that the action is successful
+        return true
+    }
     
 //    We can define our own search functionality via the UISearchResultsUpdating protocol provided by UIKit.
     // Will be called every time a change is detected in the search bar.
@@ -181,14 +198,17 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
     }
     */
 
-    /*
+    
     // MARK: - Navigation
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
+        if segue.identifier == "createHeroSegue" {
+            let destination = segue.destination as! CreateHeroViewController
+            destination.superHeroDelegate = self        }
     }
-    */
+    
 
 }

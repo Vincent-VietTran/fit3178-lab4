@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23094" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="br5-2g-Awt">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="br5-2g-Awt">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23084"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -41,14 +42,14 @@
                                 </tableViewCellContentView>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="totalCell" id="1ZH-DF-3Qm" customClass="HeroCountTableViewCell" customModule="FIT3178_W03_Lab" customModuleProvider="target">
-                                <rect key="frame" x="20" y="99" width="353" height="36.666667938232422"/>
+                                <rect key="frame" x="20" y="99" width="353" height="37"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="1ZH-DF-3Qm" id="khs-oQ-EKL">
-                                    <rect key="frame" x="0.0" y="0.0" width="353" height="36.666667938232422"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="353" height="37"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hpd-se-cpN">
-                                            <rect key="frame" x="20" y="11" width="313" height="14.666666666666664"/>
+                                            <rect key="frame" x="20" y="11" width="313" height="15"/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                                             <color key="textColor" systemColor="secondaryLabelColor"/>
                                             <nil key="highlightedColor"/>
@@ -72,12 +73,105 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="All Heroes" id="fhx-fb-xmD">
-                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="zF2-d8-Onb"/>
+                        <barButtonItem key="rightBarButtonItem" systemItem="add" id="zF2-d8-Onb">
+                            <connections>
+                                <segue destination="dmT-wJ-KVq" kind="show" identifier="createHeroSegue" id="IuM-tj-1b6"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="D0L-3W-gDT" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="2008" y="-137"/>
+        </scene>
+        <!--Create New Hero-->
+        <scene sceneID="9yp-5B-zsk">
+            <objects>
+                <viewController id="dmT-wJ-KVq" customClass="CreateHeroViewController" customModule="FIT3178_W03_Lab" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="VLH-VX-APF">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hero Name" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="S8F-GB-jVQ">
+                                <rect key="frame" x="20" y="182" width="353" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hero Abilities" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="T9P-RL-M9g">
+                                <rect key="frame" x="20" y="267" width="353" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="HDF-77-uss">
+                                <rect key="frame" x="20" y="213" width="353" height="34"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="W5w-Ac-jni">
+                                <rect key="frame" x="20" y="298" width="353" height="34"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="FpH-9V-gCA">
+                                <rect key="frame" x="20" y="383" width="353" height="32"/>
+                                <segments>
+                                    <segment title="Marvel"/>
+                                    <segment title="DC"/>
+                                </segments>
+                            </segmentedControl>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="baG-K8-RKD">
+                                <rect key="frame" x="20" y="444" width="353" height="35"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="filled" title="Create Hero"/>
+                                <connections>
+                                    <action selector="createHero:" destination="dmT-wJ-KVq" eventType="touchUpInside" id="YoN-B3-Bbg"/>
+                                </connections>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Universe" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="orj-j4-SGZ">
+                                <rect key="frame" x="20" y="352" width="353" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="1fa-e8-u1n"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="1fa-e8-u1n" firstAttribute="trailing" secondItem="S8F-GB-jVQ" secondAttribute="trailing" constant="20" id="2jl-Sy-3UT"/>
+                            <constraint firstItem="W5w-Ac-jni" firstAttribute="top" secondItem="T9P-RL-M9g" secondAttribute="bottom" constant="10" id="9iu-iu-H6b"/>
+                            <constraint firstItem="T9P-RL-M9g" firstAttribute="leading" secondItem="1fa-e8-u1n" secondAttribute="leading" constant="20" id="Dsy-jm-bHQ"/>
+                            <constraint firstItem="baG-K8-RKD" firstAttribute="top" secondItem="FpH-9V-gCA" secondAttribute="bottom" constant="30" id="Hsq-HT-DzL"/>
+                            <constraint firstItem="baG-K8-RKD" firstAttribute="leading" secondItem="1fa-e8-u1n" secondAttribute="leading" constant="20" id="LDN-Dw-7hL"/>
+                            <constraint firstItem="FpH-9V-gCA" firstAttribute="top" secondItem="orj-j4-SGZ" secondAttribute="bottom" constant="10" id="LeW-TH-vre"/>
+                            <constraint firstItem="HDF-77-uss" firstAttribute="leading" secondItem="1fa-e8-u1n" secondAttribute="leading" constant="20" id="M0Y-us-mQu"/>
+                            <constraint firstItem="1fa-e8-u1n" firstAttribute="trailing" secondItem="baG-K8-RKD" secondAttribute="trailing" constant="20" id="Ndu-OZ-ul4"/>
+                            <constraint firstItem="1fa-e8-u1n" firstAttribute="trailing" secondItem="orj-j4-SGZ" secondAttribute="trailing" constant="20" id="OZm-nY-F8P"/>
+                            <constraint firstItem="1fa-e8-u1n" firstAttribute="trailing" secondItem="HDF-77-uss" secondAttribute="trailing" constant="20" id="TXn-45-UO8"/>
+                            <constraint firstItem="S8F-GB-jVQ" firstAttribute="leading" secondItem="1fa-e8-u1n" secondAttribute="leading" constant="20" id="V0q-ok-ddI"/>
+                            <constraint firstItem="orj-j4-SGZ" firstAttribute="top" secondItem="W5w-Ac-jni" secondAttribute="bottom" constant="20" id="W1D-Xe-4ay"/>
+                            <constraint firstItem="HDF-77-uss" firstAttribute="top" secondItem="S8F-GB-jVQ" secondAttribute="bottom" constant="10" id="WRx-4k-uLR"/>
+                            <constraint firstItem="orj-j4-SGZ" firstAttribute="leading" secondItem="1fa-e8-u1n" secondAttribute="leading" constant="20" id="XGN-cu-FPh"/>
+                            <constraint firstItem="FpH-9V-gCA" firstAttribute="leading" secondItem="1fa-e8-u1n" secondAttribute="leading" constant="20" id="cGw-SA-6w2"/>
+                            <constraint firstItem="1fa-e8-u1n" firstAttribute="trailing" secondItem="T9P-RL-M9g" secondAttribute="trailing" constant="20" id="qDc-2h-MIQ"/>
+                            <constraint firstItem="W5w-Ac-jni" firstAttribute="leading" secondItem="1fa-e8-u1n" secondAttribute="leading" constant="20" id="qje-0r-33p"/>
+                            <constraint firstItem="S8F-GB-jVQ" firstAttribute="top" secondItem="1fa-e8-u1n" secondAttribute="top" constant="20" id="qvY-Fg-TvN"/>
+                            <constraint firstItem="1fa-e8-u1n" firstAttribute="trailing" secondItem="FpH-9V-gCA" secondAttribute="trailing" constant="20" id="sKY-9j-Vvb"/>
+                            <constraint firstItem="T9P-RL-M9g" firstAttribute="top" secondItem="HDF-77-uss" secondAttribute="bottom" constant="20" id="six-pL-NPm"/>
+                            <constraint firstItem="1fa-e8-u1n" firstAttribute="trailing" secondItem="W5w-Ac-jni" secondAttribute="trailing" constant="20" id="yRF-zW-9PU"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" title="Create New Hero" id="OZr-uK-e0K"/>
+                    <connections>
+                        <outlet property="abilitiesTextField" destination="W5w-Ac-jni" id="KJS-Sn-8J6"/>
+                        <outlet property="nameTextField" destination="HDF-77-uss" id="6uH-p0-81S"/>
+                        <outlet property="universeSegmentedControl" destination="FpH-9V-gCA" id="VQD-XC-ZyS"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="w3x-Ua-ZY5" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2896" y="-142"/>
         </scene>
         <!--Current Party-->
         <scene sceneID="YPk-MX-eAD">
@@ -155,7 +249,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="br5-2g-Awt" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="7ge-Ww-JGk">
-                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                        <rect key="frame" x="0.0" y="118" width="393" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -170,7 +264,7 @@
     </scenes>
     <resources>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
