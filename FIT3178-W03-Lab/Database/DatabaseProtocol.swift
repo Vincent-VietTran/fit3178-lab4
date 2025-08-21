@@ -21,6 +21,7 @@ enum DatabaseChange {
 enum ListenerType {
 case team
 case heroes
+case teams
 case all
 }
 
