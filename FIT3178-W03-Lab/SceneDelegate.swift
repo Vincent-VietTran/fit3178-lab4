@@ -34,6 +34,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillResignActive(_ scene: UIScene) {
         // Called when the scene will move from an active state to an inactive state.
         // This may occur due to temporary interruptions (ex. an incoming phone call).
+        
+//        When the scene moves to an inactive state it will attempt to call the cleanup method of the database controller from the AppDelegate
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        appDelegate?.databaseController?.cleanup()
     }
 
     func sceneWillEnterForeground(_ scene: UIScene) {

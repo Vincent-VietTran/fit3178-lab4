@@ -7,13 +7,19 @@
 
 import UIKit
 
+//It is created when the application starts, continues to exist in the
+//background and only disappears when the application is closed or killed. As such, it is
+//the perfect place to store the reference to the Core Data controller.
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
+    var databaseController: DatabaseProtocol?
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
+        
+//        Our database will always be available while the app is running. (We have defined the databaseController property as conforming to DatabaseProtocol, rather than being a  specific class. We will replace it with a different class in Lab 6.
+        databaseController = CoreDataController()
         return true
     }
 
