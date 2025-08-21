@@ -42,9 +42,18 @@ protocol DatabaseListener: AnyObject {
 //defines all the behaviour that a database must have
 protocol DatabaseProtocol: AnyObject {
     func cleanup()
+    // Suporting adding, deleting and saving of Superhero in all heroes view controller
     func addListener(listener: DatabaseListener)
     func removeListener(listener: DatabaseListener)
     func addSuperhero(name: String, abilities: String, universe: Universe)
     -> Superhero
     func deleteSuperhero(hero: Superhero)
+    
+    // Supporting adding, deleting and saving of Superhero in current party view controller
+    // Assume only single team of Superhero for the app
+    var defaultTeam: Team {get}
+    func addTeam(teamName: String) -> Team
+    func deleteTeam(team: Team)
+    func addHeroToTeam(hero: Superhero, team: Team) -> Bool
+    func removeHeroFromTeam(hero: Superhero, team: Team)
 }
