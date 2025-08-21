@@ -24,6 +24,11 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
 //    occurs, the Core Data controller will be notified and can let its listeners know.
     var allHeroesFetchedResultsController: NSFetchedResultsController<Superhero>?
     
+    
+    // properties for to support mangaging heroes in a team
+    let DEFAULT_TEAM_NAME = "Default Team"
+    var teamHeroesFetchedResultsController: NSFetchedResultsController<Superhero>?
+    
     // Constructor/Initializer
     override init() {
         // Define persistent storage container with specified name
@@ -63,6 +68,12 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
 //      if the type is either heroes or all then the method will call the delegate method onAllHeroesChange and pass through all the heroes fetched from the database.
             fetchAllHeroes())
         }
+        
+        // If listener is for team, it will be notified when data in team changed in the database
+//        ensures the listeners get a team of heroes when added to the Multicast Delegate
+        if listener.listenerType == .team || listener.listenerType == .all {
+            listener.onTeamChange(change: .update, teamHeroes: fetchTeamHeroes())
+        }
     }
     
 //    passes the specified listener to the multicast delegate class which then removes it from the set of saved listeners.
@@ -73,8 +84,6 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
     // method is responsible for adding new superheroes to Core Data.
 //    Superhero is a Core Data managed object stored within a specific managed object
 //    context.
-    
-
     func addSuperhero(name: String, abilities: String, universe: Universe) -> Superhero {
         //    Once a managed object has been created, all changes made to it are tracked. Note
         //    that any new object will not be saved to persistent memory until the save method has been called on its associated managed object context.
@@ -163,6 +172,66 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
         cleanup()
     }
     
+//  method is responsible for adding new team to Core Data.
+    func addTeam(teamName: String) -> Team {
+        let team = Team(context: persistentContainer.viewContext)
+        team.name = teamName
+        return team
+    }
+    
+    //  method is responsible for deleting a team from Core Data.
+    func deleteTeam(team: Team) {
+        persistentContainer.viewContext.delete(team)
+    }
+    
+//    attempts to add a hero to a given team and will return a boolean to
+//    indicate whether it was successful. It can fail if the team already has 6 or more heroes
+//    or if the team already contains the hero
+    func addHeroToTeam(hero: Superhero, team: Team) -> Bool {
+        guard let heroes = team.heroes, heroes.contains(hero) == false,
+        heroes.count < 6 else {
+            return false
+        }
+        team.addToHeroes(hero)
+        return true
+    }
+        
+//    This method removes a hero from the team
+    func removeHeroFromTeam(hero: Superhero, team: Team) {
+        team.removeFromHeroes(hero)
+    }
+    
+//    not part of the DatabaseProtocol but is used internally by the
+//    CoreDataController to define how to get the team results.
+    
+//    returns an array of superheroes which are part of a specified team, done
+//    through a fetched results controller similar to fetchAllHeroes
+    func fetchTeamHeroes() -> [Superhero] {
+        if teamHeroesFetchedResultsController == nil {
+            let fetchRequest: NSFetchRequest<Superhero> = Superhero.fetchRequest()
+            let nameSortDescriptor = NSSortDescriptor(key: "name", ascending: true)
+            let predicate = NSPredicate(format: "ANY teams.name == %@",
+            DEFAULT_TEAM_NAME)
+            fetchRequest.sortDescriptors = [nameSortDescriptor]
+            fetchRequest.predicate = predicate
+            teamHeroesFetchedResultsController =
+            NSFetchedResultsController<Superhero>(fetchRequest: fetchRequest,
+            managedObjectContext: persistentContainer.viewContext,
+            sectionNameKeyPath: nil, cacheName: nil)
+            teamHeroesFetchedResultsController?.delegate = self
+            do {
+            try teamHeroesFetchedResultsController?.performFetch()
+            } catch {
+                print("Fetch Request Failed: \(error)")
+            }
+        }
+        var heroes = [Superhero]()
+        if teamHeroesFetchedResultsController?.fetchedObjects != nil {
+            heroes = (teamHeroesFetchedResultsController?.fetchedObjects)!
+        }
+        return heroes
+    }
+    
     // MARK: - Fetched Results Controller Protocol methods
     func controllerDidChangeContent(_ controller:
 //    This will be called whenever the FetchedResultsController detects a change to the result of its fetch
@@ -179,6 +248,38 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
                 }
             }
         }
+        
+        // check if listeners is for team, If it is, it calls the onAllHeroesChange method
+        else if controller == teamHeroesFetchedResultsController {
+             listeners.invoke { (listener) in
+             if listener.listenerType == .team || listener.listenerType == .all {
+                 listener.onTeamChange(change: .update, teamHeroes: fetchTeamHeroes())
+                }
+             }
+        }
     }
+    
+    // MARK: - Lazy Initialisation of Default Team
+    
+//    a lazy property, it is not initialized when the rest of the class is initialized. Instead, it is initialised the first time  that its value is requested.
+    lazy var defaultTeam: Team = {
+//        A fetch request is used here to find all instances of teams with the name "Default
+//        Team". If none are found, we create one. This will be done on the first run of the
+//        application. After this point, there should always be a Default Team.
+        var teams = [Team]()
+        let request: NSFetchRequest<Team> = Team.fetchRequest()
+        let predicate = NSPredicate(format: "name = %@", DEFAULT_TEAM_NAME)
+        request.predicate = predicate
+        do {
+        try teams = persistentContainer.viewContext.fetch(request)
+        22
+        } catch {
+            print("Fetch Request Failed: \(error)")
+        }
+        if let firstTeam = teams.first {
+            return firstTeam
+        }
+            return addTeam(teamName: DEFAULT_TEAM_NAME)
+    }()
 
 }
