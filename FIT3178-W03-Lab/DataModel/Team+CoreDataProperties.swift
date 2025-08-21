@@ -25,10 +25,10 @@ extension Team {
 extension Team {
 
     @objc(addHeroesObject:)
-    @NSManaged public func addToHeroes(_ value: SuperHero)
+    @NSManaged public func addToHeroes(_ value: Superhero)
 
     @objc(removeHeroesObject:)
-    @NSManaged public func removeFromHeroes(_ value: SuperHero)
+    @NSManaged public func removeFromHeroes(_ value: Superhero)
 
     @objc(addHeroes:)
     @NSManaged public func addToHeroes(_ values: NSSet)

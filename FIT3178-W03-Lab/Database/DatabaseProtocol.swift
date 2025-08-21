@@ -24,8 +24,27 @@ case heroes
 case all
 }
 
+//This protocol defines the delegate we will use for receiving messages from the
+//database. It has three things that any implementation must take care of.
+// ● The implementation must always specify the listener’s type
+// ● An onTeamChange method for when a change to heroes in a team has occurred.
+// ● An onAllHeroesChange method for when a change to any of the heroes has
+//occurred.
+//e DatabaseListener is kept database agnostic (used by any database defined for the app)
+
 protocol DatabaseListener: AnyObject {
     var listenerType: ListenerType {get set}
-    func onTeamChange(change: DatabaseChange, teamHeroes: [SuperHero])
-    func onAllHeroesChange(change: DatabaseChange, heroes: [SuperHero])
+    func onTeamChange(change: DatabaseChange, teamHeroes: [Superhero])
+    func onAllHeroesChange(change: DatabaseChange, heroes: [Superhero])
+}
+
+
+//defines all the behaviour that a database must have
+protocol DatabaseProtocol: AnyObject {
+    func cleanup()
+    func addListener(listener: DatabaseListener)
+    func removeListener(listener: DatabaseListener)
+    func addSuperhero(name: String, abilities: String, universe: Universe)
+    -> Superhero
+    func deleteSuperhero(hero: Superhero)
 }

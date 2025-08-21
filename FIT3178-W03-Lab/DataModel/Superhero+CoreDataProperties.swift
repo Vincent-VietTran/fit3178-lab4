@@ -1,5 +1,5 @@
 //
-//  SuperHero+CoreDataProperties.swift
+//  Superhero+CoreDataProperties.swift
 //  FIT3178-W03-Lab
 //
 //  Created by Viet Tran on 21/8/2025.
@@ -15,10 +15,10 @@ enum Universe: Int32 {
 }
 
 
-extension SuperHero {
+extension Superhero {
 
-    @nonobjc public class func fetchRequest() -> NSFetchRequest<SuperHero> {
-        return NSFetchRequest<SuperHero>(entityName: "SuperHero")
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<Superhero> {
+        return NSFetchRequest<Superhero>(entityName: "Superhero")
     }
 
     @NSManaged public var abilities: String?
@@ -29,7 +29,7 @@ extension SuperHero {
 }
 
 // MARK: Generated accessors for teams
-extension SuperHero {
+extension Superhero {
 
     @objc(addTeamsObject:)
     @NSManaged public func addToTeams(_ value: Team)
@@ -45,17 +45,17 @@ extension SuperHero {
 
 }
 
-extension SuperHero : Identifiable {
+extension Superhero : Identifiable {
 
 }
 
-extension SuperHero {
-    var heroUniverse: Universe{
-        get{
+extension Superhero {
+    var heroUniverse: Universe {
+        get {
             return Universe(rawValue: self.universe)!
         }
         
-        set{
+        set {
             self.universe = newValue.rawValue
         }
     }
