@@ -8,7 +8,7 @@
 import UIKit
 import CoreData
 
-class CoreDataController: NSObject, DatabaseProtocol {
+class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsControllerDelegate {
     // Properties
 //    The “listeners” property holds all listeners added to the database inside of the
 //    MulticastDelegate class
@@ -17,6 +17,12 @@ class CoreDataController: NSObject, DatabaseProtocol {
 //    persistentContainer property holds a reference to our persistent container and
 //    within it, our managed object context. Any time we need to create, delete, retrieve, or save our database we need to do so via the managed object context.
     var persistentContainer: NSPersistentContainer
+    
+//    FetchedResultsController to monitor changes and tell all listeners when
+//    they occur.
+//    This controller will watch for changes to all heroes within the database. When a change
+//    occurs, the Core Data controller will be notified and can let its listeners know.
+    var allHeroesFetchedResultsController: NSFetchedResultsController<Superhero>?
     
     // Constructor/Initializer
     override init() {
@@ -88,17 +94,50 @@ class CoreDataController: NSObject, DatabaseProtocol {
 //    The fetchAllHeroes method is used to query Core Data to retrieve all hero entities
 //    stored within persistent memory
     func fetchAllHeroes() -> [Superhero] {
-        var heroes = [Superhero]()
-//        To query Core Data an NSFetchRequest is created
-        let request: NSFetchRequest<Superhero> = Superhero.fetchRequest()
-        do {
-//            Once a fetch request is created it must be passed to the managed object context to execute
-            try heroes = persistentContainer.viewContext.fetch(request)
-            } catch {
-            print("Fetch Request failed with error: \(error)")
+//        var heroes = [Superhero]()
+////        To query Core Data an NSFetchRequest is created
+//        let request: NSFetchRequest<Superhero> = Superhero.fetchRequest()
+//        do {
+////            Once a fetch request is created it must be passed to the managed object context to execute
+//            try heroes = persistentContainer.viewContext.fetch(request)
+//            } catch {
+//            print("Fetch Request failed with error: \(error)")
+//            }
+//            return heroes
+        
+        // If fetch result controller not instantiated
+        if allHeroesFetchedResultsController == nil {
+//            To instantiate allHeroesFetchedResultsController, we need to create a fetch request
+            let request: NSFetchRequest<Superhero> = Superhero.fetchRequest()
+//            specify a sort descriptor (required for a fetched results controller), ensuring the results have an order.
+            let nameSortDescriptor = NSSortDescriptor(key: "name", ascending: true)
+            request.sortDescriptors = [nameSortDescriptor]
+            
+            // Initialise Fetched Results Controller
+            allHeroesFetchedResultsController =
+            NSFetchedResultsController<Superhero>(fetchRequest: request,
+            managedObjectContext: persistentContainer.viewContext,
+            sectionNameKeyPath: nil, cacheName: nil)
+            
+            // Set this class to be the results delegate
+            allHeroesFetchedResultsController?.delegate = self
+            
+//            The last step is to perform the fetch request (which will begin the listening process).
+            do {
+                try allHeroesFetchedResultsController?.performFetch()
+                } catch {
+                    print("Fetch Request Failed: \(error)")
             }
+            
+        }
+//        check if it contains fetched objects. If it does, we return the array.
+        if let heroes = allHeroesFetchedResultsController?.fetchedObjects {
             return heroes
+        }
+        // else return empty array
+        return [Superhero]()
     }
+    
     
 //    creates several superheroes that can be used for testing the application.
     func createDefaultHeroes() {
@@ -124,5 +163,22 @@ class CoreDataController: NSObject, DatabaseProtocol {
         cleanup()
     }
     
+    // MARK: - Fetched Results Controller Protocol methods
+    func controllerDidChangeContent(_ controller:
+//    This will be called whenever the FetchedResultsController detects a change to the result of its fetch
+    NSFetchedResultsController<NSFetchRequestResult>) {
+//        first check to see if the controller is our allHeroesFetchedResultsController.
+        if controller == allHeroesFetchedResultsController {
+            // Call MulticastDelegate invoke method, provide a closure that will be called for each listener
+//    it checks if it is listening for changes to heroes. If it is, it calls the onAllHeroesChange method
+            listeners.invoke() { listener in
+                if listener.listenerType == .heroes
+                || listener.listenerType == .all {
+                    listener.onAllHeroesChange(change: .update,
+                    heroes: fetchAllHeroes())
+                }
+            }
+        }
+    }
 
 }
