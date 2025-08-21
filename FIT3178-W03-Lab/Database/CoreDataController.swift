@@ -18,11 +18,13 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
 //    within it, our managed object context. Any time we need to create, delete, retrieve, or save our database we need to do so via the managed object context.
     var persistentContainer: NSPersistentContainer
     
-//    FetchedResultsController to monitor changes and tell all listeners when
-//    they occur.
+//    FetchedResultsController to monitor changes and tell all listeners when they occur
 //    This controller will watch for changes to all heroes within the database. When a change
 //    occurs, the Core Data controller will be notified and can let its listeners know.
     var allHeroesFetchedResultsController: NSFetchedResultsController<Superhero>?
+    
+    // FetchedResultsController to monitor changes in Teams and tell all listeners when they occur.
+    var allTeamsFetchedResultsController: NSFetchedResultsController<Team>?
     
     
     // properties for to support mangaging heroes in a team
@@ -44,6 +46,10 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
 //        attempt to fetch all the heroes from the database. If empty, create default heroes values as placeholder
         if fetchAllHeroes().count == 0 {
             createDefaultHeroes()
+        }
+        
+        if fetchAllTeams().count == 0 {
+            createDefaultTeams()
         }
     }
   
@@ -68,12 +74,18 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
 //      if the type is either heroes or all then the method will call the delegate method onAllHeroesChange and pass through all the heroes fetched from the database.
             fetchAllHeroes())
         }
-        
+          
         // If listener is for team, it will be notified when data in team changed in the database
 //        ensures the listeners get a team of heroes when added to the Multicast Delegate
         if listener.listenerType == .team || listener.listenerType == .all {
             listener.onTeamChange(change: .update, teamHeroes: fetchTeamHeroes())
         }
+        
+        // it will provide the listener with initial immediate results depending on what type of listener it is.
+        if listener.listenerType == .teams || listener.listenerType == .all {
+            listener.onAllTeamsChange(change: .update, teams: fetchAllTeams())
+        }
+              
     }
     
 //    passes the specified listener to the multicast delegate class which then removes it from the set of saved listeners.
@@ -91,6 +103,14 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
         hero.name = name
         hero.abilities = abilities
         hero.heroUniverse = universe
+        
+        // When new data added to persistent container view context, need to save it so that data can persist when reload
+        do {
+               try persistentContainer.viewContext.save()
+           } catch {
+               print("Failed to save context when adding superhero: \(error)")
+           }
+        
         return hero
     }
     
@@ -98,6 +118,12 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
     func deleteSuperhero(hero: Superhero) {
         // Deletion is not made permanent until managed context saved
         persistentContainer.viewContext.delete(hero)
+        
+        do {
+                try persistentContainer.viewContext.save() // <--- CRITICAL for state change!
+            } catch {
+                print("Failed to save context after deleting hero: \(error)")
+            }
     }
     
 //    The fetchAllHeroes method is used to query Core Data to retrieve all hero entities
@@ -172,17 +198,90 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
         cleanup()
     }
     
+    //    creates several superheroes that can be used for testing the application.
+        func createDefaultTeams() {
+    //        The "let _"  is needed to stop a compiler warning for not
+    //        using the value returned by calls to the addSuperhero method. The underscore
+    //        indicates that we don’t care about the returned value and don’t use it again.
+            let _ = addTeam(teamName: "Team Marvel")
+            let _ = addTeam(teamName: "Team DC")
+            let _ = addTeam(teamName: "Team Comics")
+            let _ = addTeam(teamName: "Team Movies")
+            cleanup()
+        }
+    
 //  method is responsible for adding new team to Core Data.
     func addTeam(teamName: String) -> Team {
         let team = Team(context: persistentContainer.viewContext)
         team.name = teamName
+        
+        // When new data added to persistent container view context, need to save it so that data can persist when reload
+        do {
+               try persistentContainer.viewContext.save()
+           } catch {
+               print("Failed to save context when adding team: \(error)")
+           }
+        
+        // Fetch and print all teams for debugging:
+        let fetchRequest: NSFetchRequest<Team> = Team.fetchRequest()
+        do {
+            let teams = try persistentContainer.viewContext.fetch(fetchRequest)
+            var teamNames: [String] = []
+            for t in teams {
+                teamNames.append(t.name ?? "undefined")
+            }
+            print("All Teams in Core Data: \(teamNames)")
+        } catch {
+            print("Failed to fetch teams: \(error)")
+        }
         return team
     }
     
     //  method is responsible for deleting a team from Core Data.
     func deleteTeam(team: Team) {
         persistentContainer.viewContext.delete(team)
+        
+        do {
+                try persistentContainer.viewContext.save() // <--- CRITICAL for delete!
+            } catch {
+                print("Failed to save context after deleting team: \(error)")
+            }
     }
+    
+    func fetchAllTeams() -> [Team] {
+        // If fetch result controller not instantiated
+        if allTeamsFetchedResultsController == nil {
+//            To instantiate allHeroesFetchedResultsController, we need to create a fetch request
+            let request: NSFetchRequest<Team> = Team.fetchRequest()
+//            specify a sort descriptor (required for a fetched results controller), ensuring the results have an order.
+            let nameSortDescriptor = NSSortDescriptor(key: "name", ascending: true)
+            request.sortDescriptors = [nameSortDescriptor]
+            
+            // Initialise Fetched Results Controller
+            allTeamsFetchedResultsController =
+            NSFetchedResultsController<Team>(fetchRequest: request,
+            managedObjectContext: persistentContainer.viewContext,
+            sectionNameKeyPath: nil, cacheName: nil)
+            
+            // Set this class to be the results delegate
+            allTeamsFetchedResultsController?.delegate = self
+            
+//            The last step is to perform the fetch request (which will begin the listening process).
+            do {
+                try allTeamsFetchedResultsController?.performFetch()
+                } catch {
+                    print("Fetch Request Failed: \(error)")
+            }
+            
+        }
+//        check if it contains fetched objects. If it does, we return the array.
+        if let teams = allTeamsFetchedResultsController?.fetchedObjects {
+            return teams
+        }
+        // else return empty array
+        return [Team]()
+    }
+    
     
 //    attempts to add a hero to a given team and will return a boolean to
 //    indicate whether it was successful. It can fail if the team already has 6 or more heroes
@@ -193,12 +292,23 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
             return false
         }
         team.addToHeroes(hero)
+        do {
+                try persistentContainer.viewContext.save() // <--- CRITICAL for state change
+            } catch {
+                print("Failed to save context when adding hero to team: \(error)")
+            }
         return true
     }
         
 //    This method removes a hero from the team
     func removeHeroFromTeam(hero: Superhero, team: Team) {
         team.removeFromHeroes(hero)
+        
+        do {
+                try persistentContainer.viewContext.save() // <--- CRITICAL for state change
+            } catch {
+                print("Failed to save context when deleting hero from team: \(error)")
+            }
     }
     
 //    not part of the DatabaseProtocol but is used internally by the
@@ -254,6 +364,15 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
              listeners.invoke { (listener) in
              if listener.listenerType == .team || listener.listenerType == .all {
                  listener.onTeamChange(change: .update, teamHeroes: fetchTeamHeroes())
+                }
+             }
+        }
+        
+        // check if listeners is for teams, If it is, it calls the onAllTeamsChange method
+        else if controller == allTeamsFetchedResultsController {
+             listeners.invoke { (listener) in
+             if listener.listenerType == .teams || listener.listenerType == .all {
+                 listener.onAllTeamsChange(change: .update, teams: fetchAllTeams())
                 }
              }
         }
