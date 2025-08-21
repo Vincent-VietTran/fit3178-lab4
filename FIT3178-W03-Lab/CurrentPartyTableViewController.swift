@@ -7,21 +7,7 @@
 
 import UIKit
 
-class CurrentPartyTableViewController: UITableViewController, AddSuperheroDelegate {
-    func addSuperhero(_ newHero: Superhero) -> Bool {
-        if currentParty.count >= 6 {
-        return false
-        }
-        tableView.performBatchUpdates({
-        currentParty.append(newHero)
-        tableView.insertRows(at: [IndexPath(row: currentParty.count - 1, section:
-        SECTION_HERO)],
-        with: .automatic)
-        tableView.reloadSections([SECTION_INFO], with: .automatic)
-        }, completion: nil)
-        return true
-    }
-    
+class CurrentPartyTableViewController: UITableViewController, DatabaseListener {
 //    Table View Controllers have the concept of sections. Each section can
 //    have its own type of cell and number of cells. For this app, we have two sections: one
 //    for heroes in our party and one for displaying the current number of heroes in our party
@@ -38,6 +24,9 @@ class CurrentPartyTableViewController: UITableViewController, AddSuperheroDelega
     // property to store party of heroes
     var currentParty: [Superhero] = []
     
+    // Properties to handle managing data for Teams
+    var listenerType: ListenerType = .team
+    weak var databaseController: DatabaseProtocol?
     
     
     override func viewDidLoad() {
@@ -48,6 +37,10 @@ class CurrentPartyTableViewController: UITableViewController, AddSuperheroDelega
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        
+        // getting access to the AppDelegate and then storing a reference to the databaseController from there.
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        databaseController = appDelegate?.databaseController
     }
 
     // MARK: - Table view data source
@@ -127,16 +120,21 @@ class CurrentPartyTableViewController: UITableViewController, AddSuperheroDelega
 //   Handle deletion or insertion (editing style) of rows into our table view
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete && indexPath.section == SECTION_HERO {
+            // Remove hero from team when user perform row deletion
+            self.databaseController?.removeHeroFromTeam(hero:
+            currentParty[indexPath.row], team: databaseController!.defaultTeam)
+            
+            
             // Delete the row from the data source if it belongs to hero section
-            tableView.performBatchUpdates({
-                // Remove Hero from the Current Party
-                currentParty.remove(at: indexPath.row)
-                // Delete row from table view
-                tableView.deleteRows(at: [indexPath], with: .fade)
-                // Update the info section (decrement party count)
-                self.tableView.reloadSections([SECTION_INFO], with: .automatic)
-                
-            }, completion: nil)
+//            tableView.performBatchUpdates({
+//                // Remove Hero from the Current Party
+//                currentParty.remove(at: indexPath.row)
+//                // Delete row from table view
+//                tableView.deleteRows(at: [indexPath], with: .fade)
+//                // Update the info section (decrement party count)
+//                self.tableView.reloadSections([SECTION_INFO], with: .automatic)
+//                
+//            }, completion: nil)
         }
     }
     
@@ -164,11 +162,36 @@ class CurrentPartyTableViewController: UITableViewController, AddSuperheroDelega
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
-        if segue.identifier == "allHeroesSegue" {
-            let destination = segue.destination as! AllHeroesTableViewController
-            destination.superHeroDelegate = self
-        }
+        
     }
     
+    //    This method is called before the view appears on
+    //    screen. In this method, we need to add ourselves to the database listeners.
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        databaseController?.addListener(listener: self)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    databaseController?.removeListener(listener: self)
+    }
+    
+    // Conforms DatabaseListener stubs
+    func onAllHeroesChange(change: DatabaseChange, heroes: [Superhero]) {
+        // Do nothing as All heroes doesn need to care about changes in data of All heroes
+    }
+    
+    func onTeamChange(change: DatabaseChange, teamHeroes: [Superhero]) {
+        currentParty = teamHeroes
+        tableView.reloadData()
+    }
+    
+    
+    // Add super hero to team
+    func addSuperhero(_ newHero: Superhero) -> Bool {
+        return databaseController?.addHeroToTeam(hero: newHero,
+        team: databaseController!.defaultTeam) ?? false
+    }
 
 }

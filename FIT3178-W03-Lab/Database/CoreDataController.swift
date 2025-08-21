@@ -272,7 +272,6 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
         request.predicate = predicate
         do {
         try teams = persistentContainer.viewContext.fetch(request)
-        22
         } catch {
             print("Fetch Request Failed: \(error)")
         }

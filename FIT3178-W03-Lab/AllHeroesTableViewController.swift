@@ -73,10 +73,6 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
         
-        // getting access to the AppDelegate and then storing a reference to the databaseController from there.
-        let appDelegate = UIApplication.shared.delegate as? AppDelegate
-        databaseController = appDelegate?.databaseController
-        
         filteredHeroes = allHeroes
         
 //        create the UISeachController and assign it to the View Controller
@@ -93,6 +89,10 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
         navigationItem.searchController = searchController
         // This view controller decides how the search controller is presented
         definesPresentationContext = true
+        
+        // getting access to the AppDelegate and then storing a reference to the databaseController from there.
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        databaseController = appDelegate?.databaseController
     }
 
     // MARK: - Table view data source
@@ -234,7 +234,7 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
     }
     
     func onTeamChange(change: DatabaseChange, teamHeroes: [Superhero]) {
-        // Do nothing
+        // Do nothing as All heroes doesn need to care about changes in data of team
     }
     
 
