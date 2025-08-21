@@ -8,12 +8,17 @@
 import UIKit
 
 class CreateHeroViewController: UIViewController {
-    weak var superHeroDelegate: AddSuperheroDelegate?
+//    weak var superHeroDelegate: AddSuperheroDelegate?
+    weak var databaseController: DatabaseProtocol?
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        
+//        getting access to the AppDelegate and then storing a reference to the databaseController from there.
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        databaseController = appDelegate?.databaseController
     }
     
     @IBOutlet weak var nameTextField: UITextField!
@@ -25,10 +30,7 @@ class CreateHeroViewController: UIViewController {
     
     @IBAction func createHero(_ sender: Any) {
         // Do nothing if if any of the field is nil
-        guard let name = nameTextField.text, let abilities = abilitiesTextField.text, let universe =
-        Universe(rawValue: universeSegmentedControl.selectedSegmentIndex) else {
-        return
-        }
+        guard let name = nameTextField.text, let abilities = abilitiesTextField.text,  let universe = Universe(rawValue: Int32(universeSegmentedControl.selectedSegmentIndex)) else { return }
         // CHeck if any of the field is empty
         if name.isEmpty || abilities.isEmpty {
             var errorMsg = "Please ensure all fields are filled:\n"
@@ -43,9 +45,13 @@ class CreateHeroViewController: UIViewController {
         }
         
         // Create hero based on value of text fields and segmented control
-        let hero = Superhero(name: name, abilities: abilities, universe: universe)
-        // Notify delegate/listener about the new hero created
-        let _ = superHeroDelegate?.addSuperhero(hero)
+//        let hero = Superhero(name: name, abilities: abilities, universe: universe)
+//        // Notify delegate/listener about the new hero created
+//        let _ = superHeroDelegate?.addSuperhero(hero)
+        
+        // Add new hero to persistent storage
+        let _ = databaseController?.addSuperhero(name: name, abilities: abilities,
+        universe: universe)
         // Dislay pop up
         navigationController?.popViewController(animated: true)
     }
