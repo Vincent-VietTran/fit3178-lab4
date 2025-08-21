@@ -21,6 +21,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 //        Our database will always be available while the app is running. (We have defined the databaseController property as conforming to DatabaseProtocol, rather than being a  specific class. We will replace it with a different class in Lab 6.
         databaseController = CoreDataController()
         return true
+        
+        
+//        Due to the decoupling of the database and view controllers, the changes to existing
+//        code were minimal. With a change to a different database the only code that would
+//        need to be tweaked is the AppDelegate class, the Database Controller, plus the
+//        onTeamChange and onAllHeroesChange methods
     }
 
     // MARK: UISceneSession Lifecycle

@@ -19,30 +19,9 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
     
     var allHeroes: [Superhero] = []
     var filteredHeroes: [Superhero] = []
-    weak var superHeroDelegate: AddSuperheroDelegate?
     
     var listenerType = ListenerType.heroes
     weak var databaseController: DatabaseProtocol?
-    
-    //  made are conforming to the AddSuperheroDelegate
-    func addSuperhero(_ newHero: Superhero) -> Bool {
-        tableView.performBatchUpdates({
-        // TODO: Adding validation for extension task
-            
-        // Safe because search can't be active when Add button is tapped.
-        // Add newly added hero to both all heroes and filtered heroes array
-        allHeroes.append(newHero)
-        filteredHeroes.append(newHero)
-        // Insert the new record into the table view in hero section
-        tableView.insertRows(at: [IndexPath(row: filteredHeroes.count - 1, section:
-        SECTION_HERO)],
-        with: .automatic)
-        // Reload section info to reflect the change
-        tableView.reloadSections([SECTION_INFO], with: .automatic)
-        }, completion: nil)
-        // Notify that the action is successful
-        return true
-    }
     
 //    We can define our own search functionality via the UISearchResultsUpdating protocol provided by UIKit.
     // Will be called every time a change is detected in the search bar.
@@ -175,15 +154,29 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath:
     IndexPath) {
-        if let superHeroDelegate = superHeroDelegate {
-            if superHeroDelegate.addSuperhero(filteredHeroes[indexPath.row]){
-                navigationController?.popViewController(animated: false)
-                return
-            } else{
-                displayMessage(title: "party Full", message: "Unable to add more members to party")
-            }
+        // Modify when row being selected, add selected hero to heroes properties of Teams entity table
+        let hero = filteredHeroes[indexPath.row]
+        let heroAdded = databaseController?.addHeroToTeam(hero: hero, team:
+        databaseController!.defaultTeam) ?? false
+        // if hero added successfully, do noting
+        if heroAdded {
+            navigationController?.popViewController(animated: false)
+            return
         }
+        // If fail to add hero to team, display error message
+        displayMessage(title: "Party Full", message: "Unable to add more members to party")
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        // Not using superHeroDelegate anymore, so removed
+//        if let superHeroDelegate = superHeroDelegate {
+//            if superHeroDelegate.addSuperhero(filteredHeroes[indexPath.row]){
+//                navigationController?.popViewController(animated: false)
+//                return
+//            } else{
+//                displayMessage(title: "party Full", message: "Unable to add more members to party")
+//            }
+//        }
+//        tableView.deselectRow(at: indexPath, animated: true)
     }
     
 
