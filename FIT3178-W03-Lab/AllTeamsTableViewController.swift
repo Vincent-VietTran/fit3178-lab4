@@ -25,16 +25,7 @@ class AllTeamsTableViewController: UITableViewController, DatabaseListener {
         tableView.reloadData()
     }
     
-    
-    // Database listener conformance
-//    func onTeamChange(change: DatabaseChange, teamHeroes: [Superhero]) {
-//        allTeams = teamHeroes
-//        tableView.reloadData()
-//    }
-    
-//    func onAllHeroesChange(change: DatabaseChange, heroes: [Superhero]) {
-        // Do nothing
-//    }
+
     
     // Properties
     let SECTION_TEAM = 0
@@ -171,11 +162,12 @@ class AllTeamsTableViewController: UITableViewController, DatabaseListener {
         }
     }
     
-    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard indexPath.section == 0 else { return }
-        let team = allTeams[indexPath.row]
-        performSegue(withIdentifier: "showCurrentTeamParty", sender: team)
-    }
+    // If use this approach, remove segue from cell in storyboard and uncomment prepare function
+//    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        guard indexPath.section == 0 else { return }
+//        let team = allTeams[indexPath.row]
+//        performSegue(withIdentifier: "showCurrentTeamParty", sender: team)
+//    }
     
     /*
      // Override to support rearranging the table view.
@@ -199,8 +191,8 @@ class AllTeamsTableViewController: UITableViewController, DatabaseListener {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
      // Get the new view controller using segue.destination.
      // Pass the selected object to the new view controller.
-        if segue.identifier == "showCurrentParty" {
-           let _ = segue.destination as? CurrentPartyTableViewController
+        if segue.identifier == "showCurrentTeamParty" {
+            let _ = segue.destination as? CurrentPartyTableViewController
        }
      }
     
@@ -212,8 +204,8 @@ class AllTeamsTableViewController: UITableViewController, DatabaseListener {
         }
         
         override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        databaseController?.removeListener(listener: self)
+            super.viewWillDisappear(animated)
+            databaseController?.removeListener(listener: self)
         }           
         
 }
