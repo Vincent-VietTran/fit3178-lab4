@@ -162,13 +162,6 @@ class AllTeamsTableViewController: UITableViewController, DatabaseListener {
         }
     }
     
-    // If use this approach, remove segue from cell in storyboard and uncomment prepare function
-//    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-//        guard indexPath.section == 0 else { return }
-//        let team = allTeams[indexPath.row]
-//        performSegue(withIdentifier: "showCurrentTeamParty", sender: team)
-//    }
-    
     /*
      // Override to support rearranging the table view.
      override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
@@ -186,13 +179,27 @@ class AllTeamsTableViewController: UITableViewController, DatabaseListener {
     
     
      // MARK: - Navigation
-     
+    // In a storyboard-based application, you will often want to do a little preparation before navigation
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
+        
+        let indexPath = tableView.indexPath(for: sender as! UITableViewCell)!
+        
+        if indexPath.row == 0 {
+            return false
+        }
+        return true
+    }
+    
      // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-     // Get the new view controller using segue.destination.
-     // Pass the selected object to the new view controller.
+//      Get the new view controller using segue.destination.
+//      Pass the selected object to the new view controller.
         if segue.identifier == "showCurrentTeamParty" {
-            let _ = segue.destination as? CurrentPartyTableViewController
+            if let indexPath = tableView.indexPathForSelectedRow {
+                let team = allTeams[indexPath.row]
+                let destination = segue.destination as! CurrentPartyTableViewController
+                destination.currentTeam = team
+            }
        }
      }
     

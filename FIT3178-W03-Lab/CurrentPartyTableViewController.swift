@@ -28,6 +28,8 @@ class CurrentPartyTableViewController: UITableViewController, DatabaseListener {
     var listenerType: ListenerType = .team
     weak var databaseController: DatabaseProtocol?
     
+    // Get reference of team being selected from all teams view
+    var currentTeam: Team?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,6 +43,10 @@ class CurrentPartyTableViewController: UITableViewController, DatabaseListener {
         // getting access to the AppDelegate and then storing a reference to the databaseController from there.
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
         databaseController = appDelegate?.databaseController
+        
+        // Set navigation bar title to team name
+        print(currentTeam?.name)
+        navigationItem.title = currentTeam?.name
     }
 
     // MARK: - Table view data source
