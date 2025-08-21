@@ -78,7 +78,7 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
         // If listener is for team, it will be notified when data in team changed in the database
 //        ensures the listeners get a team of heroes when added to the Multicast Delegate
         if listener.listenerType == .team || listener.listenerType == .all {
-            listener.onTeamChange(change: .update, teamHeroes: fetchTeamHeroes())
+            listener.onTeamChange(change: .update, ,teamHeroes: fetchTeamHeroes())
         }
         
         // it will provide the listener with initial immediate results depending on what type of listener it is.
@@ -320,8 +320,7 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
         if teamHeroesFetchedResultsController == nil {
             let fetchRequest: NSFetchRequest<Superhero> = Superhero.fetchRequest()
             let nameSortDescriptor = NSSortDescriptor(key: "name", ascending: true)
-            let predicate = NSPredicate(format: "ANY teams.name == %@",
-            DEFAULT_TEAM_NAME)
+            let predicate = NSPredicate(format: "ANY teams == %@", team)
             fetchRequest.sortDescriptors = [nameSortDescriptor]
             fetchRequest.predicate = predicate
             teamHeroesFetchedResultsController =

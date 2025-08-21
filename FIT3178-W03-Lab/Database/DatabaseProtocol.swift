@@ -35,7 +35,7 @@ case all
 
 protocol DatabaseListener: AnyObject {
     var listenerType: ListenerType {get set}
-    func onTeamChange(change: DatabaseChange, teamHeroes: [Superhero])
+    func onTeamChange(change: DatabaseChange, team: Team, teamHeroes: [Superhero])
     func onAllHeroesChange(change: DatabaseChange, heroes: [Superhero])
     func onAllTeamsChange(change: DatabaseChange, teams: [Team])
 }

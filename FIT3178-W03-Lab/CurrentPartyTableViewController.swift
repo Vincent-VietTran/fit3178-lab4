@@ -45,7 +45,7 @@ class CurrentPartyTableViewController: UITableViewController, DatabaseListener {
         databaseController = appDelegate?.databaseController
         
         // Set navigation bar title to team name
-        print(currentTeam?.name)
+        print(currentTeam?.name ?? "No team passed")
         navigationItem.title = currentTeam?.name
     }
 
@@ -127,20 +127,10 @@ class CurrentPartyTableViewController: UITableViewController, DatabaseListener {
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete && indexPath.section == SECTION_HERO {
             // Remove hero from team when user perform row deletion
-            self.databaseController?.removeHeroFromTeam(hero:
-            currentParty[indexPath.row], team: databaseController!.defaultTeam)
-            
-            
-            // Delete the row from the data source if it belongs to hero section
-//            tableView.performBatchUpdates({
-//                // Remove Hero from the Current Party
-//                currentParty.remove(at: indexPath.row)
-//                // Delete row from table view
-//                tableView.deleteRows(at: [indexPath], with: .fade)
-//                // Update the info section (decrement party count)
-//                self.tableView.reloadSections([SECTION_INFO], with: .automatic)
-//                
-//            }, completion: nil)
+            if let team = currentTeam {
+                        let hero = currentParty[indexPath.row]
+                        databaseController?.removeHeroFromTeam(hero: hero, team: team)
+                    }
         }
     }
     
@@ -168,8 +158,12 @@ class CurrentPartyTableViewController: UITableViewController, DatabaseListener {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
-        
+        if segue.identifier == "allHeroesSegue" {
+            let destination = segue.destination as! AllHeroesTableViewController
+            destination.partyCurrentTeam = currentTeam
+        }
     }
+    
     
     //    This method is called before the view appears on
     //    screen. In this method, we need to add ourselves to the database listeners.
@@ -179,8 +173,8 @@ class CurrentPartyTableViewController: UITableViewController, DatabaseListener {
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-    super.viewWillDisappear(animated)
-    databaseController?.removeListener(listener: self)
+        super.viewWillDisappear(animated)
+        databaseController?.removeListener(listener: self)
     }
     
     // Conforms DatabaseListener stubs
@@ -188,9 +182,11 @@ class CurrentPartyTableViewController: UITableViewController, DatabaseListener {
         // Do nothing as All heroes doesn need to care about changes in data of All heroes
     }
     
-    func onTeamChange(change: DatabaseChange, teamHeroes: [Superhero]) {
-        currentParty = teamHeroes
-        tableView.reloadData()
+    func onTeamChange(change: DatabaseChange, team: Team, teamHeroes: [Superhero]) {
+        if team == currentTeam {
+            currentParty = teamHeroes
+            tableView.reloadData()
+        }
     }
     
     func onAllTeamsChange(change: DatabaseChange, teams: [Team]) {
@@ -199,8 +195,8 @@ class CurrentPartyTableViewController: UITableViewController, DatabaseListener {
     
     // Add super hero to team
     func addSuperhero(_ newHero: Superhero) -> Bool {
-        return databaseController?.addHeroToTeam(hero: newHero,
-        team: databaseController!.defaultTeam) ?? false
+        guard let team = currentTeam else { return false }
+            return databaseController?.addHeroToTeam(hero: newHero, team: team) ?? false
     }
 
 }

@@ -23,6 +23,8 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
     var listenerType = ListenerType.heroes
     weak var databaseController: DatabaseProtocol?
     
+    var partyCurrentTeam: Team?
+    
 //    We can define our own search functionality via the UISearchResultsUpdating protocol provided by UIKit.
     // Will be called every time a change is detected in the search bar.
     func updateSearchResults(for searchController: UISearchController) {
@@ -72,6 +74,9 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
         // getting access to the AppDelegate and then storing a reference to the databaseController from there.
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
         databaseController = appDelegate?.databaseController
+        
+        
+        print("partyCurrentTeam is: \(partyCurrentTeam?.name ?? "nil")")
     }
 
     // MARK: - Table view data source
@@ -156,8 +161,30 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
     IndexPath) {
         // Modify when row being selected, add selected hero to heroes properties of Teams entity table
         let hero = filteredHeroes[indexPath.row]
-        let heroAdded = databaseController?.addHeroToTeam(hero: hero, team:
-        databaseController!.defaultTeam) ?? false
+        print("Attempting to add hero \(hero.name ?? "") to \(partyCurrentTeam?.name ?? "nil")")
+        
+        var heroAdded = false
+        if let team = partyCurrentTeam {
+            // debug
+            print("Before adding, team '\(team.name ?? "nil")' has \(team.heroes?.count ?? 0) heroes.")
+                if let heroes = team.heroes as? Set<Superhero> {
+                    print("Heroes in team: \(heroes.map { $0.name ?? "Unnamed" })")
+                } else {
+                    print("Team heroes is nil or not a Set<Superhero>")
+                }
+            
+            // Adding hero to team
+            heroAdded = databaseController?.addHeroToTeam(hero: hero, team: team) ?? false
+            
+            // After adding, print again (if your model updates in memory)
+                print("After adding, team '\(team.name ?? "nil")' has \(team.heroes?.count ?? 0) heroes.")
+                if let heroes = team.heroes as? Set<Superhero> {
+                    print("Heroes in team: \(heroes.map { $0.name ?? "Unnamed" })")
+                }
+        }
+        
+        print("heroAdded result: \(heroAdded)")
+        
         // if hero added successfully, do noting
         if heroAdded {
             navigationController?.popViewController(animated: false)
@@ -166,17 +193,6 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
         // If fail to add hero to team, display error message
         displayMessage(title: "Party Full Or Duplicate Hero", message: "Unable to add more members to party")
         tableView.deselectRow(at: indexPath, animated: true)
-        
-        // Not using superHeroDelegate anymore, so removed
-//        if let superHeroDelegate = superHeroDelegate {
-//            if superHeroDelegate.addSuperhero(filteredHeroes[indexPath.row]){
-//                navigationController?.popViewController(animated: false)
-//                return
-//            } else{
-//                displayMessage(title: "party Full", message: "Unable to add more members to party")
-//            }
-//        }
-//        tableView.deselectRow(at: indexPath, animated: true)
     }
     
 
@@ -226,7 +242,7 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
         updateSearchResults(for: navigationItem.searchController!)
     }
     
-    func onTeamChange(change: DatabaseChange, teamHeroes: [Superhero]) {
+    func onTeamChange(change: DatabaseChange, team: Team, teamHeroes: [Superhero]) {
         // Do nothing as All heroes doesn need to care about changes in data of team
     }
     

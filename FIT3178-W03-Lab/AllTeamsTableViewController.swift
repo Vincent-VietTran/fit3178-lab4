@@ -11,7 +11,7 @@ import UIKit
 class AllTeamsTableViewController: UITableViewController, DatabaseListener {
     
     // DatabaseListener stubs
-    func onTeamChange(change: DatabaseChange, teamHeroes: [Superhero]) {
+    func onTeamChange(change: DatabaseChange, team: Team, teamHeroes: [Superhero]) {
         // Do nothing
     }
     
