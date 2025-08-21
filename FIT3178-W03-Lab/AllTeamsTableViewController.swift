@@ -8,7 +8,23 @@
 import UIKit
 
 //class AllTeamsTableViewController: UITableViewController, DatabaseListener{
-class AllTeamsTableViewController: UITableViewController {
+class AllTeamsTableViewController: UITableViewController, DatabaseListener {
+    
+    // DatabaseListener stubs
+    func onTeamChange(change: DatabaseChange, teamHeroes: [Superhero]) {
+        // Do nothing
+    }
+    
+    func onAllHeroesChange(change: DatabaseChange, heroes: [Superhero]) {
+        // Do nothing
+    }
+    
+    func onAllTeamsChange(change: DatabaseChange, teams: [Team]) {
+        print("onAllTeamsChange called. Team count: \(teams.count)")
+        allTeams = teams
+        tableView.reloadData()
+    }
+    
     
     // Database listener conformance
 //    func onTeamChange(change: DatabaseChange, teamHeroes: [Superhero]) {
@@ -31,7 +47,7 @@ class AllTeamsTableViewController: UITableViewController {
     let MAX_TEAM_COUNT = 10
     
     var allTeams: [Team] = []
-    var listenerType = ListenerType.team
+    var listenerType = ListenerType.teams
     weak var databaseController: DatabaseProtocol?
     
     override func viewDidLoad() {
@@ -73,8 +89,6 @@ class AllTeamsTableViewController: UITableViewController {
             if self.allTeams.count < self.MAX_TEAM_COUNT {
                 // If max count not exceeded, proceed with adding team to database
                 let _ = self.databaseController?.addTeam(teamName: name)
-                // Dislay pop up
-                self.navigationController?.popViewController(animated: true)
             } else {
                 self.displayMessage(title: "Team Count exceeded", message: "You can only have up to \(self.MAX_TEAM_COUNT) teams.")
             }
@@ -186,8 +200,20 @@ class AllTeamsTableViewController: UITableViewController {
      // Get the new view controller using segue.destination.
      // Pass the selected object to the new view controller.
         if segue.identifier == "showCurrentParty" {
-           let destination = segue.destination as? CurrentPartyTableViewController
+           let _ = segue.destination as? CurrentPartyTableViewController
        }
      }
+    
+    //    This method is called before the view appears on
+    //    screen. In this method, we need to add ourselves to the database listeners.
+        override func viewWillAppear(_ animated: Bool) {
+            super.viewWillAppear(animated)
+            databaseController?.addListener(listener: self)
+        }
+        
+        override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        databaseController?.removeListener(listener: self)
+        }           
         
 }

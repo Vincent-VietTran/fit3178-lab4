@@ -42,14 +42,14 @@
                                 </tableViewCellContentView>
                             </tableViewCell>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="totalCell" id="1ZH-DF-3Qm" customClass="HeroCountTableViewCell" customModule="FIT3178_W03_Lab" customModuleProvider="target">
-                                <rect key="frame" x="20" y="99" width="353" height="37.333332061767578"/>
+                                <rect key="frame" x="20" y="99" width="353" height="36.666667938232422"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="1ZH-DF-3Qm" id="khs-oQ-EKL">
-                                    <rect key="frame" x="0.0" y="0.0" width="353" height="37.333332061767578"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="353" height="36.666667938232422"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Hpd-se-cpN">
-                                            <rect key="frame" x="20" y="11" width="313" height="15.333333333333336"/>
+                                            <rect key="frame" x="20" y="11" width="313" height="14.666666666666664"/>
                                             <fontDescription key="fontDescription" style="UICTFontTextStyleCaption1"/>
                                             <color key="textColor" systemColor="secondaryLabelColor"/>
                                             <nil key="highlightedColor"/>
@@ -306,24 +306,6 @@
             <point key="canvasLocation" x="1309" y="-987"/>
         </scene>
         <!--Navigation Controller-->
-        <scene sceneID="V3z-1k-W5N">
-            <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="br5-2g-Awt" sceneMemberID="viewController">
-                    <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="7ge-Ww-JGk">
-                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
-                        <autoresizingMask key="autoresizingMask"/>
-                    </navigationBar>
-                    <nil name="viewControllers"/>
-                    <connections>
-                        <segue destination="wNl-2K-ZjM" kind="relationship" relationship="rootViewController" id="tNL-qA-46Z"/>
-                    </connections>
-                </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="tYw-dj-C0K" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="119.84732824427481" y="-136.61971830985917"/>
-        </scene>
-        <!--Navigation Controller-->
         <scene sceneID="Bbq-CR-VZZ">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="66P-uQ-VOA" sceneMemberID="viewController">
@@ -342,12 +324,9 @@
             <point key="canvasLocation" x="382" y="-987"/>
         </scene>
     </scenes>
-    <inferredMetricsTieBreakers>
-        <segue reference="tNL-qA-46Z"/>
-    </inferredMetricsTieBreakers>
     <resources>
         <systemColor name="secondaryLabelColor">
-            <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.23529411759999999" green="0.23529411759999999" blue="0.26274509800000001" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

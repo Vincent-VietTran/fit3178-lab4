@@ -187,6 +187,9 @@ class CurrentPartyTableViewController: UITableViewController, DatabaseListener {
         tableView.reloadData()
     }
     
+    func onAllTeamsChange(change: DatabaseChange, teams: [Team]) {
+        // Do nothing as All teams doesn need to care about changes here
+    }
     
     // Add super hero to team
     func addSuperhero(_ newHero: Superhero) -> Bool {

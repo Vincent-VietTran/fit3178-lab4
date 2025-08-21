@@ -230,5 +230,9 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
         // Do nothing as All heroes doesn need to care about changes in data of team
     }
     
+    func onAllTeamsChange(change: DatabaseChange, teams: [Team]) {
+        // Do nothing as All heroes doesn need to care about changes in here
+        
+    }
 
 }
