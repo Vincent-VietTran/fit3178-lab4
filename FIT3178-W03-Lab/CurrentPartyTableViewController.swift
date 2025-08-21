@@ -48,9 +48,6 @@ class CurrentPartyTableViewController: UITableViewController, AddSuperheroDelega
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
-        
-        // Remove when finalised
-//        testHeroes()
     }
 
     // MARK: - Table view data source
@@ -143,17 +140,6 @@ class CurrentPartyTableViewController: UITableViewController, AddSuperheroDelega
         }
     }
     
-    func testHeroes(){
-        // Populated table with data
-        currentParty.append(Superhero(name: "Superman", abilities: "Super Powered Alien", universe:
-        .dc))
-        currentParty.append(Superhero(name: "Wonder Woman", abilities: "Goddess", universe: .dc))
-        currentParty.append(Superhero(name: "The Flash", abilities: "Speed", universe: .dc))
-        currentParty.append(Superhero(name: "Green Lantern", abilities: "Power Ring", universe:
-        .dc))
-        currentParty.append(Superhero(name: "Cyborg", abilities: "Robot Beep Beep", universe: .dc))
-        currentParty.append(Superhero(name: "Aquaman", abilities: "Atlantian", universe: .dc))
-    }
     
 
     /*
