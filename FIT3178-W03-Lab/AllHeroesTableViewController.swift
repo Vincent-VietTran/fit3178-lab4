@@ -7,7 +7,9 @@
 
 import UIKit
 
-class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdating, AddSuperheroDelegate {
+class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdating, DatabaseListener {
+    
+    // Properties
     let SECTION_HERO = 0
     let SECTION_INFO = 1
     let NUM_SECTIONS = 2
@@ -18,6 +20,9 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
     var allHeroes: [Superhero] = []
     var filteredHeroes: [Superhero] = []
     weak var superHeroDelegate: AddSuperheroDelegate?
+    
+    var listenerType = ListenerType.heroes
+    weak var databaseController: DatabaseProtocol?
     
     //  made are conforming to the AddSuperheroDelegate
     func addSuperhero(_ newHero: Superhero) -> Bool {
@@ -67,7 +72,11 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
 
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
-        createDefaultHeroes()
+        
+        // getting access to the AppDelegate and then storing a reference to the databaseController from there.
+        let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        databaseController = appDelegate?.databaseController
+        
         filteredHeroes = allHeroes
         
 //        create the UISeachController and assign it to the View Controller
@@ -142,20 +151,25 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
     // Override to support editing the table view.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete && indexPath.section == SECTION_HERO {
+            
+            // Delete hero from database instead of made-up database (Allheroes represented as an array)
+            let hero = filteredHeroes[indexPath.row]
+            databaseController?.deleteSuperhero(hero: hero)
+            
             // Delete the row from the data source if it belongs to hero section
-            tableView.performBatchUpdates({
-                // Make sure when a hero delelted,it is removed in both filtered and all heroes list
-                if let index = self.allHeroes.firstIndex(of: filteredHeroes[indexPath.row]) {
-                self.allHeroes.remove(at: index)
-                }
-                // Remove Hero from the list of filtered heroes
-                filteredHeroes.remove(at: indexPath.row)
-                // Delete row from table view
-                tableView.deleteRows(at: [indexPath], with: .fade)
-                // Update the info section (decrement hero count)
-                self.tableView.reloadSections([SECTION_INFO], with: .automatic)
-                
-            }, completion: nil)
+//            tableView.performBatchUpdates({
+//                // Make sure when a hero delelted,it is removed in both filtered and all heroes list
+//                if let index = self.allHeroes.firstIndex(of: filteredHeroes[indexPath.row]) {
+//                self.allHeroes.remove(at: index)
+//                }
+//                // Remove Hero from the list of filtered heroes
+//                filteredHeroes.remove(at: indexPath.row)
+//                // Delete row from table view
+//                tableView.deleteRows(at: [indexPath], with: .fade)
+//                // Update the info section (decrement hero count)
+//                self.tableView.reloadSections([SECTION_INFO], with: .automatic)
+//                
+//            }, completion: nil)
         }
     }
     
@@ -172,16 +186,6 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    func createDefaultHeroes(){
-        allHeroes.append(Superhero(name: "Bruce Wayne", abilities: "Money", universe: .dc))
-        allHeroes.append(Superhero(name: "Superman", abilities: "Super Powered Alien", universe:
-        .dc))
-        allHeroes.append(Superhero(name: "Wonder Woman", abilities: "Goddess", universe: .dc))
-        allHeroes.append(Superhero(name: "The Flash", abilities: "Speed", universe: .dc))
-        allHeroes.append(Superhero(name: "Green Lantern", abilities: "Power Ring", universe: .dc))
-        allHeroes.append(Superhero(name: "Cyborg", abilities: "Robot Beep Beep", universe: .dc))
-        allHeroes.append(Superhero(name: "Aquaman", abilities: "Atlantian", universe: .dc))
-    }
 
     /*
     // Override to support rearranging the table view.
@@ -205,9 +209,32 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         // Get the new view controller using segue.destination.
         // Pass the selected object to the new view controller.
-        if segue.identifier == "createHeroSegue" {
-            let destination = segue.destination as! CreateHeroViewController
-            destination.superHeroDelegate = self        }
+//        if segue.identifier == "createHeroSegue" {
+//            let destination = segue.destination as! CreateHeroViewController
+//            destination.superHeroDelegate = self
+//        }
+    }
+    
+//    This method is called before the view appears on
+//    screen. In this method, we need to add ourselves to the database listeners.
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        databaseController?.addListener(listener: self)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+    super.viewWillDisappear(animated)
+    databaseController?.removeListener(listener: self)
+    }
+    
+    // Conforms DatabaseListener stubs
+    func onAllHeroesChange(change: DatabaseChange, heroes: [Superhero]) {
+        allHeroes = heroes
+        updateSearchResults(for: navigationItem.searchController!)
+    }
+    
+    func onTeamChange(change: DatabaseChange, teamHeroes: [Superhero]) {
+        // Do nothing
     }
     
 
