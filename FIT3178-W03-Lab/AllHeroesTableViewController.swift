@@ -164,7 +164,7 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
             return
         }
         // If fail to add hero to team, display error message
-        displayMessage(title: "Party Full", message: "Unable to add more members to party")
+        displayMessage(title: "Party Full Or Duplicate Hero", message: "Unable to add more members to party")
         tableView.deselectRow(at: indexPath, animated: true)
         
         // Not using superHeroDelegate anymore, so removed
