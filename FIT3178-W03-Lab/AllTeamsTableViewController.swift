@@ -188,9 +188,7 @@ class AllTeamsTableViewController: UITableViewController, DatabaseListener {
     
      // MARK: - Navigation
     // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
-        
-        let indexPath = tableView.indexPath(for: sender as! UITableViewCell)!
+    override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {        
         return true
     }
     
