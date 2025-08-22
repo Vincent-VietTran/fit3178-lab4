@@ -99,7 +99,7 @@ class CurrentPartyTableViewController: UITableViewController, TeamDatabaseListen
             var content = infoCell.defaultContentConfiguration()
             
             if currentParty.isEmpty{
-                content.text = "No Heroes in Party. Tap + to add some"
+                content.text = "No Heroes in \(currentTeam?.name ?? "Undefined Team"). Tap + to add some"
             } else{
                 content.text = "\(currentParty.count)/6 Heroes in Party"
             }

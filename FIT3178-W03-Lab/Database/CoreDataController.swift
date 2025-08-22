@@ -201,22 +201,24 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
 //        The "let _"  is needed to stop a compiler warning for not
 //        using the value returned by calls to the addSuperhero method. The underscore
 //        indicates that we don’t care about the returned value and don’t use it again.
-        let _ = addSuperhero(name: "Bruce Wayne", abilities: "Money", universe:
-        .dc)
-        let _ = addSuperhero(name: "Superman", abilities: "Super Powered Alien", universe: .dc)
-        let _ = addSuperhero(name: "Wonder Woman", abilities: "Goddess",
-        universe: .dc)
-        let _ = addSuperhero(name: "The Flash", abilities: "Speed", universe:
-        .dc)
-        let _ = addSuperhero(name: "Green Lantern", abilities: "Power Ring",
-        universe: .dc)
-        let _ = addSuperhero(name: "Cyborg", abilities: "Robot Beep Beep",
-        universe: .dc)
-        let _ = addSuperhero(name: "Aquaman", abilities: "Atlantian", universe:
-        .dc)
-        let _ = addSuperhero(name: "Captain Marvel", abilities: "Superhuman Strength", universe: .marvel)
-        let _ = addSuperhero(name: "Spider-Man", abilities: "Spider Sense",
-        universe: .marvel)
+        // DC Heroes
+            let _ = addSuperhero(name: "Bruce Wayne", abilities: "Money", universe: .dc)
+            let _ = addSuperhero(name: "Superman", abilities: "Super Powered Alien", universe: .dc)
+            let _ = addSuperhero(name: "Wonder Woman", abilities: "Goddess", universe: .dc)
+            let _ = addSuperhero(name: "The Flash", abilities: "Speed", universe: .dc)
+            let _ = addSuperhero(name: "Green Lantern", abilities: "Power Ring", universe: .dc)
+            let _ = addSuperhero(name: "Cyborg", abilities: "Robot Beep Beep", universe: .dc)
+            let _ = addSuperhero(name: "Aquaman", abilities: "Atlantian", universe: .dc)
+            
+            // Marvel Heroes
+            let _ = addSuperhero(name: "Iron Man", abilities: "Powered armor suit, genius intellect", universe: .marvel)
+            let _ = addSuperhero(name: "Captain America", abilities: "Super soldier, shield combat", universe: .marvel)
+            let _ = addSuperhero(name: "Thor", abilities: "God of Thunder, Mjolnir", universe: .marvel)
+            let _ = addSuperhero(name: "Hulk", abilities: "Super strength, regeneration", universe: .marvel)
+            let _ = addSuperhero(name: "Black Widow", abilities: "Martial arts, espionage", universe: .marvel)
+            let _ = addSuperhero(name: "Spider-Man", abilities: "Wall-crawling, spider sense", universe: .marvel)
+            let _ = addSuperhero(name: "Captain Marvel", abilities: "Energy projection, flight", universe: .marvel)
+            
         cleanup()
     }
     
