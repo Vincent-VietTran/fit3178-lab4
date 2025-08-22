@@ -233,7 +233,20 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
         }
     
 //  method is responsible for adding new team to Core Data.
-    func addTeam(teamName: String) -> Team {
+    func addTeam(teamName: String) -> Team? {
+        // Check for duplicate by name
+        let fetchRequest: NSFetchRequest<Team> = Team.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "name ==[c] %@", teamName)
+            do {
+                let existing = try persistentContainer.viewContext.fetch(fetchRequest)
+                if let duplicate = existing.first {
+                    print("Duplicate team found: \(duplicate.name ?? "")")
+                    return nil // or return duplicate, or handle as needed
+                }
+            } catch {
+                print("Failed to check for duplicates: \(error)")
+            }
+        
         let team = Team(context: persistentContainer.viewContext)
         team.name = teamName
         
@@ -245,7 +258,6 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
            }
         
         // Fetch and print all teams for debugging:
-        let fetchRequest: NSFetchRequest<Team> = Team.fetchRequest()
         do {
             let teams = try persistentContainer.viewContext.fetch(fetchRequest)
             var teamNames: [String] = []
@@ -256,6 +268,7 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
         } catch {
             print("Failed to fetch teams: \(error)")
         }
+        
         return team
     }
     

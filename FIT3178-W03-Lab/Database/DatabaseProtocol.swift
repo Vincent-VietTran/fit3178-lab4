@@ -61,7 +61,7 @@ protocol DatabaseProtocol: AnyObject {
     
     // Support add and delete of team in all teams view controller
 //    var defaultTeam: Team {get}
-    func addTeam(teamName: String) -> Team
+    func addTeam(teamName: String) -> Team?
     func deleteTeam(team: Team)
     
     // Supporting adding, deleting and saving of Superhero in current party view controller

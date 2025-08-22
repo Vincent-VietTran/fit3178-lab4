@@ -74,12 +74,20 @@ class AllTeamsTableViewController: UITableViewController, DatabaseListener {
         let okAction = UIAlertAction(title: "OK", style: .default) { _ in
             // Validating name fields (no empty string)
             guard let name = alert.textFields?.first?.text?.trimmingCharacters(in: .whitespaces),
-                  !name.isEmpty else { return }
+                  !name.isEmpty else {
+                self.displayMessage(title: "Required field", message: "Team name must not be empty")
+                return
+            }
             
             // Check if max team count exceeded
             if self.allTeams.count < self.MAX_TEAM_COUNT {
                 // If max count not exceeded, proceed with adding team to database
-                let _ = self.databaseController?.addTeam(teamName: name)
+                guard let _ = self.databaseController?.addTeam(teamName: name) else {
+                    self.displayMessage(title: "Duplicate Team Name", message: "Team name already exist")
+                    return
+                }
+                
+                
             } else {
                 self.displayMessage(title: "Team Count exceeded", message: "You can only have up to \(self.MAX_TEAM_COUNT) teams.")
             }
