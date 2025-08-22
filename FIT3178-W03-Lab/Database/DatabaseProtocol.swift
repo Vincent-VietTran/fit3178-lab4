@@ -56,7 +56,7 @@ protocol DatabaseProtocol: AnyObject {
     
     // Suporting adding, deleting and saving of Superhero in all heroes view controller
     func addSuperhero(name: String, abilities: String, universe: Universe)
-    -> Superhero
+    -> Superhero?
     func deleteSuperhero(hero: Superhero)
     
     // Support add and delete of team in all teams view controller

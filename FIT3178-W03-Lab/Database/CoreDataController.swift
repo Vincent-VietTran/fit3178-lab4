@@ -103,7 +103,22 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
     // method is responsible for adding new superheroes to Core Data.
 //    Superhero is a Core Data managed object stored within a specific managed object
 //    context.
-    func addSuperhero(name: String, abilities: String, universe: Universe) -> Superhero {
+    func addSuperhero(name: String, abilities: String, universe: Universe) -> Superhero? {
+        // Check for duplicate by name
+            let fetchRequest: NSFetchRequest<Superhero> = Superhero.fetchRequest()
+            fetchRequest.predicate = NSPredicate(format: "name ==[c] %@", name)
+            fetchRequest.fetchLimit = 1
+
+            do {
+                let existing = try persistentContainer.viewContext.fetch(fetchRequest)
+                if let duplicate = existing.first {
+                    print("Duplicate hero found: \(duplicate.name ?? "") in \(duplicate.universe)")
+                    return nil // or return duplicate, or handle as needed
+                }
+            } catch {
+                print("Failed to check for duplicates: \(error)")
+            }
+        
         //    Once a managed object has been created, all changes made to it are tracked. Note
         //    that any new object will not be saved to persistent memory until the save method has been called on its associated managed object context.
         let hero = Superhero(context: persistentContainer.viewContext)

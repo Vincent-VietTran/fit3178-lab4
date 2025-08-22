@@ -30,19 +30,36 @@ class CreateHeroViewController: UIViewController {
     
     @IBAction func createHero(_ sender: Any) {
         // Do nothing if if any of the field is nil
-        guard let name = nameTextField.text, let abilities = abilitiesTextField.text,  let universe = Universe(rawValue: Int32(universeSegmentedControl.selectedSegmentIndex)) else { return }
-        // CHeck if any of the field is empty
-        if name.isEmpty || abilities.isEmpty {
-            var errorMsg = "Please ensure all fields are filled:\n"
-            if name.isEmpty {
-                errorMsg += "- Must provide a name\n"
-            }
-            if abilities.isEmpty {
-                errorMsg += "- Must provide abilities"
-            }
-            displayMessage(title: "Not all fields filled", message: errorMsg)
-            return
-        }
+//        guard let name = nameTextField.text, let abilities = abilitiesTextField.text,  let universe = Universe(rawValue: Int32(universeSegmentedControl.selectedSegmentIndex)) else { return }
+//        // CHeck if any of the field is empty
+//        if name.isEmpty || abilities.isEmpty {
+//            var errorMsg = "Please ensure all fields are filled:\n"
+//            if name.isEmpty {
+//                errorMsg += "- Must provide a name\n"
+//            }
+//            if abilities.isEmpty {
+//                errorMsg += "- Must provide abilities"
+//            }
+//            displayMessage(title: "Not all fields filled", message: errorMsg)
+//            return
+//        }
+        
+        guard let name = nameTextField.text, let abilities = abilitiesTextField.text, let universe = Universe(rawValue: Int32(universeSegmentedControl.selectedSegmentIndex)) else { return }
+                let trimmedName = name.trimmingCharacters(in: .whitespacesAndNewlines)
+                let trimmedAbilities = abilities.trimmingCharacters(in: .whitespacesAndNewlines)
+                // CHeck if any of the field is empty
+                if trimmedName.isEmpty || trimmedAbilities.isEmpty {
+                    var errorMsg = "Please ensure all fields are filled:\n"
+                    if trimmedName.isEmpty {
+                        errorMsg += "- Must provide a name\n"
+                    }
+                    if trimmedAbilities.isEmpty {
+                        errorMsg += "- Must provide abilities"
+                    }
+                    displayMessage(title: "Not all fields filled", message: errorMsg)
+                    return
+                }
+
         
         // Create hero based on value of text fields and segmented control
 //        let hero = Superhero(name: name, abilities: abilities, universe: universe)
@@ -50,8 +67,12 @@ class CreateHeroViewController: UIViewController {
 //        let _ = superHeroDelegate?.addSuperhero(hero)
         
         // Add new hero to persistent storage
-        let _ = databaseController?.addSuperhero(name: name, abilities: abilities,
-        universe: universe)
+        guard let _ = databaseController?.addSuperhero(name: name, abilities: abilities,
+                                                            universe: universe) else {
+            displayMessage(title: "Duplicate Hero Name", message: "Hero name already exist")
+            return
+        }
+        
         // Dislay pop up
         navigationController?.popViewController(animated: true)
     }
