@@ -75,7 +75,7 @@ class AllHeroesTableViewController: UITableViewController, UISearchResultsUpdati
         let appDelegate = UIApplication.shared.delegate as? AppDelegate
         databaseController = appDelegate?.databaseController
         
-        
+        // partyCurrentTeam will be passed on to all heroes vc when being seguing from current party vc
         print("partyCurrentTeam is: \(partyCurrentTeam?.name ?? "nil")")
     }
 

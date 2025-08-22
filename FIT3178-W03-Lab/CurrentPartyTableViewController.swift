@@ -7,7 +7,8 @@
 
 import UIKit
 
-class CurrentPartyTableViewController: UITableViewController, DatabaseListener {
+class CurrentPartyTableViewController: UITableViewController, TeamDatabaseListener {
+    
 //    Table View Controllers have the concept of sections. Each section can
 //    have its own type of cell and number of cells. For this app, we have two sections: one
 //    for heroes in our party and one for displaying the current number of heroes in our party
@@ -164,7 +165,7 @@ class CurrentPartyTableViewController: UITableViewController, DatabaseListener {
         }
     }
     
-    
+    // MARK: - Listener Lifecycle
     //    This method is called before the view appears on
     //    screen. In this method, we need to add ourselves to the database listeners.
     override func viewWillAppear(_ animated: Bool) {
@@ -177,6 +178,7 @@ class CurrentPartyTableViewController: UITableViewController, DatabaseListener {
         databaseController?.removeListener(listener: self)
     }
     
+    // MARK: - DatabaseListener methods
     // Conforms DatabaseListener stubs
     func onAllHeroesChange(change: DatabaseChange, heroes: [Superhero]) {
         // Do nothing as All heroes doesn need to care about changes in data of All heroes
@@ -193,6 +195,7 @@ class CurrentPartyTableViewController: UITableViewController, DatabaseListener {
         // Do nothing as All teams doesn need to care about changes here
     }
     
+    // MARK: - Add hero
     // Add super hero to team
     func addSuperhero(_ newHero: Superhero) -> Bool {
         guard let team = currentTeam else { return false }

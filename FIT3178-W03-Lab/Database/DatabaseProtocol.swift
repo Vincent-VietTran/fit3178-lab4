@@ -35,9 +35,13 @@ case all
 
 protocol DatabaseListener: AnyObject {
     var listenerType: ListenerType {get set}
-    func onTeamChange(change: DatabaseChange, team: Team, teamHeroes: [Superhero])
     func onAllHeroesChange(change: DatabaseChange, heroes: [Superhero])
     func onAllTeamsChange(change: DatabaseChange, teams: [Team])
+}
+
+protocol TeamDatabaseListener: DatabaseListener{
+    var currentTeam: Team? {get}
+    func onTeamChange(change: DatabaseChange, team: Team, teamHeroes: [Superhero])
 }
 
 
@@ -56,7 +60,7 @@ protocol DatabaseProtocol: AnyObject {
     func deleteSuperhero(hero: Superhero)
     
     // Support add and delete of team in all teams view controller
-    var defaultTeam: Team {get}
+//    var defaultTeam: Team {get}
     func addTeam(teamName: String) -> Team
     func deleteTeam(team: Team)
     

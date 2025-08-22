@@ -77,9 +77,12 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
           
         // If listener is for team, it will be notified when data in team changed in the database
 //        ensures the listeners get a team of heroes when added to the Multicast Delegate
-        if listener.listenerType == .team || listener.listenerType == .all {
-            listener.onTeamChange(change: .update, ,teamHeroes: fetchTeamHeroes())
-        }
+        // For team listeners only
+            if let teamListener = listener as? TeamDatabaseListener {
+                if let team = teamListener.currentTeam{
+                    teamListener.onTeamChange(change: .update, team: team, teamHeroes: fetchTeamHeroes(for: team))
+                }
+            }
         
         // it will provide the listener with initial immediate results depending on what type of listener it is.
         if listener.listenerType == .teams || listener.listenerType == .all {
@@ -316,11 +319,11 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
     
 //    returns an array of superheroes which are part of a specified team, done
 //    through a fetched results controller similar to fetchAllHeroes
-    func fetchTeamHeroes() -> [Superhero] {
+    func fetchTeamHeroes(for currentTeam: Team) -> [Superhero] {
         if teamHeroesFetchedResultsController == nil {
             let fetchRequest: NSFetchRequest<Superhero> = Superhero.fetchRequest()
             let nameSortDescriptor = NSSortDescriptor(key: "name", ascending: true)
-            let predicate = NSPredicate(format: "ANY teams == %@", team)
+            let predicate = NSPredicate(format: "ANY teams == %@", currentTeam)
             fetchRequest.sortDescriptors = [nameSortDescriptor]
             fetchRequest.predicate = predicate
             teamHeroesFetchedResultsController =
@@ -361,9 +364,11 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
         // check if listeners is for team, If it is, it calls the onAllHeroesChange method
         else if controller == teamHeroesFetchedResultsController {
              listeners.invoke { (listener) in
-             if listener.listenerType == .team || listener.listenerType == .all {
-                 listener.onTeamChange(change: .update, teamHeroes: fetchTeamHeroes())
-                }
+                 if let teamListener = listener as? TeamDatabaseListener {
+                     if let team = teamListener.currentTeam{
+                         teamListener.onTeamChange(change: .update, team: team, teamHeroes: fetchTeamHeroes(for: team))
+                     }
+                 }
              }
         }
         
@@ -380,23 +385,23 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
     // MARK: - Lazy Initialisation of Default Team
     
 //    a lazy property, it is not initialized when the rest of the class is initialized. Instead, it is initialised the first time  that its value is requested.
-    lazy var defaultTeam: Team = {
-//        A fetch request is used here to find all instances of teams with the name "Default
-//        Team". If none are found, we create one. This will be done on the first run of the
-//        application. After this point, there should always be a Default Team.
-        var teams = [Team]()
-        let request: NSFetchRequest<Team> = Team.fetchRequest()
-        let predicate = NSPredicate(format: "name = %@", DEFAULT_TEAM_NAME)
-        request.predicate = predicate
-        do {
-        try teams = persistentContainer.viewContext.fetch(request)
-        } catch {
-            print("Fetch Request Failed: \(error)")
-        }
-        if let firstTeam = teams.first {
-            return firstTeam
-        }
-            return addTeam(teamName: DEFAULT_TEAM_NAME)
-    }()
+//    lazy var defaultTeam: Team = {
+////        A fetch request is used here to find all instances of teams with the name "Default
+////        Team". If none are found, we create one. This will be done on the first run of the
+////        application. After this point, there should always be a Default Team.
+//        var teams = [Team]()
+//        let request: NSFetchRequest<Team> = Team.fetchRequest()
+//        let predicate = NSPredicate(format: "name = %@", DEFAULT_TEAM_NAME)
+//        request.predicate = predicate
+//        do {
+//        try teams = persistentContainer.viewContext.fetch(request)
+//        } catch {
+//            print("Fetch Request Failed: \(error)")
+//        }
+//        if let firstTeam = teams.first {
+//            return firstTeam
+//        }
+//            return addTeam(teamName: DEFAULT_TEAM_NAME)
+//    }()
 
 }
