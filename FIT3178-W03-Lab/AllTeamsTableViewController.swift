@@ -191,10 +191,6 @@ class AllTeamsTableViewController: UITableViewController, DatabaseListener {
     override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
         
         let indexPath = tableView.indexPath(for: sender as! UITableViewCell)!
-        
-        if indexPath.row == 0 {
-            return false
-        }
         return true
     }
     
