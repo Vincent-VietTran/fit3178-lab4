@@ -23,13 +23,17 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
 //    occurs, the Core Data controller will be notified and can let its listeners know.
     var allHeroesFetchedResultsController: NSFetchedResultsController<Superhero>?
     
-    // FetchedResultsController to monitor changes in Teams and tell all listeners when they occur.
+    // FetchedResultsController to monitor changes in all teams vc and tell all listeners when they occur.
     var allTeamsFetchedResultsController: NSFetchedResultsController<Team>?
     
     
     // properties for to support mangaging heroes in a team
-    let DEFAULT_TEAM_NAME = "Default Team"
-    var teamHeroesFetchedResultsController: NSFetchedResultsController<Superhero>?
+//    let DEFAULT_TEAM_NAME = "Default Team"
+    
+    // FetchedResultsController to monitor changes in a team (current part vc) and tell all listeners when they occur.
+    
+    // Different team may have different list of heroes, so want different fetechResultsController for each team (uniquely identified by team NSManagedObjectID)
+    var teamHeroesFetchedResultsControllers: [NSManagedObjectID: NSFetchedResultsController<Superhero>] = [:]
     
     // Constructor/Initializer
     override init() {
@@ -314,34 +318,38 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
             }
     }
     
+    func teamHeroesFetchedResultsController(for team: Team) -> NSFetchedResultsController<Superhero> {
+        let key = team.objectID
+        if let frc = teamHeroesFetchedResultsControllers[key] {
+            return frc
+        }
+        let fetchRequest: NSFetchRequest<Superhero> = Superhero.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "ANY teams == %@", team)
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: "name", ascending: true)]
+        let frc = NSFetchedResultsController(
+            fetchRequest: fetchRequest,
+            managedObjectContext: persistentContainer.viewContext,
+            sectionNameKeyPath: nil,
+            cacheName: nil
+        )
+        frc.delegate = self // or a delegate per team if needed
+        do {
+            try frc.performFetch()
+        } catch {
+            print("Failed to fetch team heroes for \(team.name ?? "unknown"): \(error)")
+        }
+        teamHeroesFetchedResultsControllers[key] = frc
+        return frc
+    }
+    
 //    not part of the DatabaseProtocol but is used internally by the
 //    CoreDataController to define how to get the team results.
     
 //    returns an array of superheroes which are part of a specified team, done
 //    through a fetched results controller similar to fetchAllHeroes
     func fetchTeamHeroes(for currentTeam: Team) -> [Superhero] {
-        if teamHeroesFetchedResultsController == nil {
-            let fetchRequest: NSFetchRequest<Superhero> = Superhero.fetchRequest()
-            let nameSortDescriptor = NSSortDescriptor(key: "name", ascending: true)
-            let predicate = NSPredicate(format: "ANY teams == %@", currentTeam)
-            fetchRequest.sortDescriptors = [nameSortDescriptor]
-            fetchRequest.predicate = predicate
-            teamHeroesFetchedResultsController =
-            NSFetchedResultsController<Superhero>(fetchRequest: fetchRequest,
-            managedObjectContext: persistentContainer.viewContext,
-            sectionNameKeyPath: nil, cacheName: nil)
-            teamHeroesFetchedResultsController?.delegate = self
-            do {
-            try teamHeroesFetchedResultsController?.performFetch()
-            } catch {
-                print("Fetch Request Failed: \(error)")
-            }
-        }
-        var heroes = [Superhero]()
-        if teamHeroesFetchedResultsController?.fetchedObjects != nil {
-            heroes = (teamHeroesFetchedResultsController?.fetchedObjects)!
-        }
-        return heroes
+        let frc = teamHeroesFetchedResultsController(for: currentTeam)
+            return frc.fetchedObjects ?? []
     }
     
     // MARK: - Fetched Results Controller Protocol methods
@@ -362,15 +370,18 @@ class CoreDataController: NSObject, DatabaseProtocol, NSFetchedResultsController
         }
         
         // check if listeners is for team, If it is, it calls the onAllHeroesChange method
-        else if controller == teamHeroesFetchedResultsController {
-             listeners.invoke { (listener) in
-                 if let teamListener = listener as? TeamDatabaseListener {
-                     if let team = teamListener.currentTeam{
-                         teamListener.onTeamChange(change: .update, team: team, teamHeroes: fetchTeamHeroes(for: team))
-                     }
-                 }
-             }
-        }
+        // Check if it's a team FRC (by searching the dictionary values)
+        if let (teamID, _) = teamHeroesFetchedResultsControllers.first(where: { $0.value === controller }) {
+               // Find listeners for this team
+               listeners.invoke { listener in
+                   if let teamListener = listener as? TeamDatabaseListener,
+                      let team = teamListener.currentTeam,
+                      team.objectID == teamID {
+                       let teamHeroes = fetchTeamHeroes(for: team)
+                       teamListener.onTeamChange(change: .update, team: team, teamHeroes: teamHeroes)
+                   }
+               }
+           }
         
         // check if listeners is for teams, If it is, it calls the onAllTeamsChange method
         else if controller == allTeamsFetchedResultsController {
